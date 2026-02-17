@@ -251,6 +251,31 @@ lnget ln info
 lnget tokens list --json | jq '[.[] | .amount_paid_sat] | add'
 ```
 
+## Live Endpoint Example: Maximum Sats DVM
+
+Use this to test a real paid endpoint end-to-end.
+
+```bash
+# 1) Probe the challenge without paying (HTTP 402 + WWW-Authenticate: L402)
+curl -sS -i -X POST https://maximumsats.com/api/dvm \
+  -H 'content-type: application/json' \
+  -d '{"prompt":"Summarize NIP-85 in one sentence."}' | sed -n '1,20p'
+
+# 2) Preview with lnget (no payment, challenge details only)
+lnget --no-pay --max-cost 30 -X POST \
+  -H 'content-type: application/json' \
+  -d '{"prompt":"Summarize NIP-85 in one sentence."}' \
+  https://maximumsats.com/api/dvm
+
+# 3) Pay and execute (auto-pays if invoice <= --max-cost)
+lnget --max-cost 30 -X POST \
+  -H 'content-type: application/json' \
+  -d '{"prompt":"Summarize NIP-85 in one sentence."}' \
+  https://maximumsats.com/api/dvm
+```
+
+If `--max-cost` is below the invoice amount, lnget exits before paying.
+
 ## The Server Side: Aperture
 
 lnget handles the client side of L402. On the server side,

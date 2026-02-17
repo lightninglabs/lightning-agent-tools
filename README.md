@@ -309,7 +309,7 @@ production checklist.
 |----------|-------------|
 | [Architecture](docs/architecture.md) | System design, component map, plugin discovery, data flows |
 | [Security](docs/security.md) | Three-tier security model, remote signer, macaroon scoping, production checklist |
-| [L402 and lnget](docs/l402-and-lnget.md) | The L402 protocol, lnget usage, spending controls, token caching |
+| [L402 and lnget](docs/l402-and-lnget.md) | The L402 protocol, lnget usage, spending controls, token caching, and a live paid endpoint example |
 | [MCP Server](docs/mcp-server.md) | LNC mechanics, setup walkthrough, 18-tool reference, configuration |
 | [Commerce](docs/commerce.md) | Buyer and seller agent setup, the commerce loop, cost management |
 | [Two-Agent Setup](docs/two-agent-setup.md) | Signer agent + node agent walkthrough for production key isolation |
