@@ -65,6 +65,62 @@ instantly. This is what makes L402 native to agent workflows: agents can
 discover and pay for resources on the fly without requiring a human to pre-register
 accounts.
 
+## Service Discovery
+
+An agent using `lnget` needs to know _where_ to find L402-protected resources.
+[satring.com](https://satring.com) is a public directory of L402 (and
+[x402](https://www.x402.org/)) API services with live health monitoring, ratings,
+and pricing metadata. Agents can query it to discover endpoints before paying.
+
+### Browsing the Directory
+
+The satring API is open for basic queries (no payment required for search):
+
+```bash
+# List all live L402 services
+lnget -q "https://satring.com/api/v1/services?protocol=L402&status=live" | jq '.services[]'
+
+# Filter by category (ai-ml, data, finance, identity, media, search, social, storage, tools)
+lnget -q "https://satring.com/api/v1/services?category=ai-ml&protocol=L402" | jq '.services[]'
+
+# Full-text search by name or description
+lnget -q "https://satring.com/api/v1/search?q=inference&protocol=L402" | jq '.services[]'
+```
+
+Each service entry includes its URL, pricing (in sats and USD), protocol (`L402`
+or `X402`), categories, average rating, and health status. Filter parameters
+`protocol` (`L402` or `X402`) and `status` (`live`, `confirmed`, `unverified`,
+`dead`) can be combined freely.
+
+### Discovery-then-Purchase Workflow
+
+An agent can chain directory lookup with `lnget` to find and pay for a resource
+in two steps:
+
+```bash
+# Step 1: Find a live data API under 500 sats
+SERVICE_URL=$(lnget -q "https://satring.com/api/v1/services?category=data&protocol=L402&status=live" \
+  | jq -r '.services[] | select(.pricing_sats <= 500) | .url' | head -1)
+
+# Step 2: Fetch the discovered endpoint
+lnget --max-cost 500 "$SERVICE_URL"
+```
+
+### Paid Analytics and Reputation
+
+Deeper directory data (analytics, reputation scores) is payment-gated via L402:
+
+```bash
+# Directory-wide analytics (L402-gated)
+lnget --max-cost 50 https://satring.com/api/v1/analytics | jq .
+
+# Per-service reputation report (L402-gated)
+lnget --max-cost 50 https://satring.com/api/v1/services/example-api/reputation | jq .
+```
+
+Satring itself uses L402 for premium endpoints, so `lnget` handles the payment
+flow transparently.
+
 ## lnget
 
 `lnget` automates the entire L402 flow in a single command:

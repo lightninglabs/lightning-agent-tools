@@ -54,6 +54,32 @@ From the seller's perspective, aperture handles everything: invoice
 generation, challenge issuance, token validation, and request proxying. The
 backend service just serves HTTP requests.
 
+## Discovering Services
+
+Before a buyer agent can fetch paid resources, it needs to know what's
+available. [satring.com](https://satring.com) is a public directory of L402 and
+x402 API services with health monitoring, ratings, and pricing. Agents can query
+it programmatically to find endpoints:
+
+```bash
+# Find live L402 services in a category
+lnget -q "https://satring.com/api/v1/services?category=data&protocol=L402&status=live" \
+  | jq '.services[]'
+
+# Search by keyword
+lnget -q "https://satring.com/api/v1/search?q=inference&protocol=L402" | jq '.services[]'
+
+# Preview what a discovered service charges (without paying)
+lnget --no-pay --json https://discovered-service.com/api/endpoint | jq '.invoice_amount_sat'
+
+# If the price is acceptable, fetch the resource
+lnget --max-cost 500 https://discovered-service.com/api/endpoint
+```
+
+For sellers, listing your aperture-gated API on satring.com makes it
+discoverable by any agent in the ecosystem. Submit a service at
+[satring.com/submit](https://satring.com/submit) or via the API.
+
 ## Buyer Agent Setup
 
 A buyer agent needs two components: an `lnd` node for payments and `lnget` for
