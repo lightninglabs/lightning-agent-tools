@@ -314,6 +314,11 @@ production checklist.
 | [Commerce](docs/commerce.md) | Buyer and seller agent setup, the commerce loop, cost management |
 | [Two-Agent Setup](docs/two-agent-setup.md) | Signer agent + node agent walkthrough for production key isolation |
 | [Quick Reference](docs/quickref.md) | Every command in one place |
+| [L402 API Examples](docs/l402-api-examples.md) | Real-world L402 API examples from the LightningFaucet registry |
+
+### L402 API Directory
+
+- [LightningFaucet L402 Registry](https://lightningfaucet.com/l402-registry) — curated directory of live L402 APIs for testing and production use
 
 Each skill also has a detailed `SKILL.md` in its directory under `skills/` with
 operational reference material: script options, configuration templates, file
