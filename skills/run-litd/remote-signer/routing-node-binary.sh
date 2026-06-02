@@ -39,7 +39,10 @@ else
 
     # Import Signing key
     echo "Importing Signing key..."
-    gpg --keyserver "$KEY_SERVER" --recv-keys "$KEY_ID" || { echo "Failed to import PGP key."; exit 1; }
+    if ! curl -sf "https://keyserver.ubuntu.com/pks/lookup?op=get&options=mr&search=0x$KEY_ID" | gpg --import 2>/dev/null; then
+        echo "[!] HTTPS key fetch failed, trying HKP..."
+        gpg --keyserver "$KEY_SERVER" --recv-keys "$KEY_ID" || { echo "[-] Failed to import PGP key."; exit 1; }
+    fi
 
     # Download litd binary
     echo "Downloading binary..."

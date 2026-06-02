@@ -160,7 +160,7 @@ else
     if [[ "$NETWORK" == "mainnet" ]]; then
         DEFAULT_PEERS=("${MAINNET_PEERS[@]}")
         NETWORK_FLAG="bitcoin.mainnet=1"
-        FEE_LINE=$'\n[Fee]\nfee.url=https://nodes.lightning.computer/fees/v1/btc-fee-estimates.json'
+        FEE_LINE=$'\n[fee]\nfee.url=https://nodes.lightning.computer/fees/v1/btc-fee-estimates.json'
     else
         DEFAULT_PEERS=("${SIGNET_PEERS[@]}")
         NETWORK_FLAG="bitcoin.signet=1"
