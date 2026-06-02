@@ -136,6 +136,11 @@ lnget ln lnc revoke <session-id>                           # revoke session
 lnget ln neutrino init                                     # initialize
 lnget ln neutrino fund                                     # funding address
 lnget ln neutrino balance                                  # check balance
+
+# Dashboard & API server
+lnget serve                                                # start API (localhost:2402)
+lnget serve --addr localhost:2402                           # custom address
+cd dashboard && yarn dev                                   # start dashboard (localhost:3001)
 ```
 
 ## Aperture
@@ -242,6 +247,7 @@ skills/macaroon-bakery/scripts/bake.sh --role pay-only \
 | `~/.lnget/signer/credentials-bundle/` | Exported signer credentials |
 | `~/.lnget/config.yaml` | lnget configuration |
 | `~/.lnget/tokens/<domain>/` | L402 cached tokens |
+| `~/.lnget/events.db` | Payment event log (SQLite) |
 | `~/.lnd/` | lnd data (chain, macaroons, TLS) |
 | `~/.lnd/data/chain/bitcoin/<network>/admin.macaroon` | Admin macaroon |
 | `~/.lnd/tls.cert` | lnd TLS certificate |

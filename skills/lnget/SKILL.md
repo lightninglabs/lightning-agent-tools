@@ -284,11 +284,65 @@ lnget --json https://api.example.com/data.json | jq '.l402_paid'
 lnget -k https://localhost:8081/api/data
 ```
 
+## Dashboard and API Server
+
+lnget includes an event logger, REST API server, and web dashboard for
+monitoring L402 spending activity.
+
+### Event Logging
+
+All L402 payment events are automatically recorded to `~/.lnget/events.db`
+(SQLite). This is enabled by default:
+
+```yaml
+events:
+  enabled: true
+  db_path: ~/.lnget/events.db
+```
+
+### API Server (`lnget serve`)
+
+```bash
+# Start the API server
+lnget serve
+
+# Custom address
+lnget serve --addr localhost:2402
+```
+
+Endpoints:
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /api/events` | List events (query: limit, offset, domain, status) |
+| `GET /api/events/stats` | Aggregate spending statistics |
+| `GET /api/events/domains` | Per-domain spending breakdown |
+| `GET /api/tokens` | List all cached tokens |
+| `DELETE /api/tokens/:domain` | Remove a token |
+| `GET /api/status` | Lightning backend connection status |
+| `GET /api/config` | Current config (sensitive fields redacted) |
+
+### Web Dashboard
+
+```bash
+cd dashboard
+yarn install
+yarn dev
+# Open http://localhost:3001
+```
+
+Pages:
+- **Dashboard** — Total spent, payment count, active tokens, wallet balance, charts
+- **Tokens** — Cached L402 tokens with management actions
+- **Payments** — Paginated event log with filters and volume chart
+- **Status** — Lightning backend info and configuration overview
+
 ## File Locations
 
 | Path | Purpose |
 |------|---------|
 | `~/.lnget/config.yaml` | Configuration file |
 | `~/.lnget/tokens/<domain>/` | Per-domain token storage |
+| `~/.lnget/events.db` | Payment event log (SQLite) |
 | `~/.lnget/lnc/sessions/` | LNC session persistence |
 | `~/.lnget/neutrino/` | Embedded wallet data |
