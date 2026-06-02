@@ -60,7 +60,10 @@ else
     cd "$DOWNLOAD_DIR" || { echo "[-] Failed to navigate to download directory."; exit 1; }
 
     echo "[+] Importing LND signing key..."
-    gpg --keyserver "$KEY_SERVER" --recv-keys "$KEY_ID" || { echo "[-] Failed to import PGP key."; exit 1; }
+    if ! curl -sf "https://keyserver.ubuntu.com/pks/lookup?op=get&options=mr&search=0x$KEY_ID" | gpg --import 2>/dev/null; then
+        echo "[!] HTTPS key fetch failed, trying HKP..."
+        gpg --keyserver "$KEY_SERVER" --recv-keys "$KEY_ID" || { echo "[-] Failed to import PGP key."; exit 1; }
+    fi
 
     echo "[+] Downloading LND binary, manifest, and signature..."
     wget "$BINARY_URL"    || { echo "[-] Failed to download binary."; exit 1; }
@@ -158,7 +161,7 @@ else
     if [[ "$NETWORK" == "mainnet" ]]; then
         DEFAULT_PEERS=("${MAINNET_PEERS[@]}")
         NETWORK_FLAG="bitcoin.mainnet=1"
-        FEE_LINE="neutrino.feeurl=https://nodes.lightning.computer/fees/v1/btc-fee-estimates.json"
+        FEE_LINE=$'\n[Fee]\nfee.url=https://nodes.lightning.computer/fees/v1/btc-fee-estimates.json'
     else
         DEFAULT_PEERS=("${SIGNET_PEERS[@]}")
         NETWORK_FLAG="bitcoin.signet=1"
@@ -265,7 +268,12 @@ MACAROON_PATH="$LND_DIR/data/chain/bitcoin/$NETWORK/admin.macaroon"
 SEED_FILE="$LND_DIR/seed_phrase.txt"
 XPUB_FILE="$LND_DIR/accounts.json"
 SIGNER_MACAROON="$LND_DIR/signer.macaroon"
-TIMEOUT=180
+# mainnet Neutrino takes significantly longer to start than signet
+if [[ "$NETWORK" == "mainnet" ]]; then
+    TIMEOUT=600
+else
+    TIMEOUT=180
+fi
 
 if [[ -f "$MACAROON_PATH" ]]; then
     echo "[!] Wallet already initialized. Skipping wallet setup."
@@ -275,6 +283,7 @@ else
     ELAPSED=0
     while [[ ! -f "$LND_DIR/tls.cert" ]]; do
         sleep 2; ELAPSED=$((ELAPSED + 2))
+        if ! systemctl is-active --quiet lnd; then echo "[-] lnd exited unexpectedly — check 'journalctl -u lnd' for errors."; exit 1; fi
         if [[ $ELAPSED -ge $TIMEOUT ]]; then echo "[-] Timed out waiting for TLS cert."; exit 1; fi
     done
     echo "[+] TLS certificate ready."
