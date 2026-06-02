@@ -379,6 +379,7 @@ lncli --network=signet --macaroonpath=~/.lnd/signer.macaroon \
 | Pitfall | Fix |
 |---------|-----|
 | `synced_to_graph: false` on routing node | Connect to at least one peer: `lncli connect <pubkey>@<host>:<port>` |
+| Neutrino stuck at `num_peers: 0` on mainnet | No hardcoded mainnet peers — LND uses DNS seeding which can take a few minutes. If still 0, test a candidate peer with `nc -zv <host> 8333` and add working ones to `lnd.conf` as `neutrino.connect=<host>:8333`. |
 | Script exits "Missing required signer file" | Run `scp` to copy all three files from signer — see Step 2 above. Don't forget to rename `tls.cert` → `signer-tls.cert`. |
 | `tls.cert` and `signer-tls.cert` confusion | The routing node generates its own `~/.lit/tls.cert`. The signer's cert must live at `~/.lnd/signer-tls.cert`. `lit.conf` must point `remotesigner.tlscertpath` to the signer cert, not the local one. |
 | Watch-only wallet creation fails | `createwatchonly` must be run while litd is running but *before* auto-unlock lines are uncommented in `lit.conf`. Run `routing-node3.sh` only after the wallet exists. |

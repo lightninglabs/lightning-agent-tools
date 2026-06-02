@@ -32,10 +32,9 @@ KEY_SERVER="hkps://keyserver.ubuntu.com"
 DOWNLOAD_DIR="/tmp/lnd_release_verification"
 
 # Default Neutrino peers (must support BIP 157/158 compact block filters)
-MAINNET_PEERS=(
-    "btcd-mainnet.lightning.computer:8333"
-    "node.lightning.directory:8333"
-)
+# No hardcoded mainnet peers — LND discovers peers via Bitcoin DNS seeds automatically.
+# Add peers manually when prompted, or leave blank to rely on DNS seeding.
+MAINNET_PEERS=()
 SIGNET_PEERS=(
     "172.233.20.188:38333"
 )
