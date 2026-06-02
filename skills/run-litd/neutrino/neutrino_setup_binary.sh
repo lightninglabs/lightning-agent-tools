@@ -28,12 +28,10 @@ KEY_ID="26984CB69EB8C4A26196F7A4D7D916376026F177"
 KEY_SERVER="hkps://keyserver.ubuntu.com"
 DOWNLOAD_DIR="/tmp/litd_release_verification"
 
-# Default Neutrino peers
-# These must support BIP 157/158 compact block filters.
-MAINNET_PEERS=(
-    "btcd-mainnet.lightning.computer:8333"
-    "node.lightning.directory:8333"
-)
+# Default Neutrino peers (must support BIP 157/158 compact block filters)
+# No hardcoded mainnet peers — LND discovers peers via Bitcoin DNS seeds automatically.
+# Add peers manually when prompted, or leave blank to rely on DNS seeding.
+MAINNET_PEERS=()
 SIGNET_PEERS=(
     "172.233.20.188:38333"
 )
@@ -55,7 +53,10 @@ else
     cd "$DOWNLOAD_DIR" || { echo "[-] Failed to navigate to download directory."; exit 1; }
 
     echo "[+] Importing signing key..."
-    gpg --keyserver "$KEY_SERVER" --recv-keys "$KEY_ID" || { echo "[-] Failed to import PGP key."; exit 1; }
+    if ! curl -sf "https://keyserver.ubuntu.com/pks/lookup?op=get&options=mr&search=0x$KEY_ID" | gpg --import 2>/dev/null; then
+        echo "[!] HTTPS key fetch failed, trying HKP..."
+        gpg --keyserver "$KEY_SERVER" --recv-keys "$KEY_ID" || { echo "[-] Failed to import PGP key."; exit 1; }
+    fi
 
     echo "[+] Downloading litd binary, signature, and manifest..."
     wget "$BINARY_URL"   || { echo "[-] Failed to download binary."; exit 1; }
@@ -154,7 +155,7 @@ else
     if [[ "$NETWORK" == "mainnet" ]]; then
         DEFAULT_PEERS=("${MAINNET_PEERS[@]}")
         NETWORK_FLAG="lnd.bitcoin.mainnet=1"
-        FEE_LINE="lnd.neutrino.feeurl=https://nodes.lightning.computer/fees/v1/btc-fee-estimates.json"
+        FEE_LINE="lnd.fee.url=https://nodes.lightning.computer/fees/v1/btc-fee-estimates.json"
         SIGNET_OPTS="#pool-mode=disable
 #loop-mode=disable
 #autopilot.disable=true"
