@@ -81,7 +81,22 @@ lnget config init
 lnget ln status
 ```
 
-### Step 6: Fetch Paid Resources
+### Step 6: Discover Services
+
+Agents can find L402 endpoints programmatically via
+[satring.com](https://satring.com), a public directory of L402 and x402 API
+services:
+
+```bash
+# Browse live L402 services by category
+lnget -q "https://satring.com/api/v1/services?category=data&protocol=L402&status=live" \
+  | jq '.services[]'
+
+# Search by keyword
+lnget -q "https://satring.com/api/v1/search?q=inference&protocol=L402" | jq '.services[]'
+```
+
+### Step 7: Fetch Paid Resources
 
 ```bash
 # Fetch an L402-protected resource
@@ -94,7 +109,7 @@ lnget --no-pay https://api.example.com/paid-data
 lnget tokens list
 ```
 
-### Step 7: Host Paid Endpoints (Optional)
+### Step 8: Host Paid Endpoints (Optional)
 
 ```bash
 # Start your backend service
