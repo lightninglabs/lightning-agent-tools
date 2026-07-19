@@ -5,8 +5,5 @@
   "author": {
     "name": "Lightning Labs"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/lightninglabs/lightning-agent-kit"
-  }
+  "repository": "https://github.com/lightninglabs/lightning-agent-tools"
 }
